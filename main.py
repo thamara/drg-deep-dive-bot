@@ -3,6 +3,10 @@ import discord
 import praw
 from tabulate import tabulate
 
+# If running locally, support .env file for setting the environment variables
+from dotenv import load_dotenv
+load_dotenv()
+
 class DeepDive:
     def __init__(self, type, name, biome):
         self.type = type
