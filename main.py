@@ -87,11 +87,14 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-    if message.content.startswith('/deep-dive-raw'):
+
+    raw_cmd = ['/deep-dive-raw']
+    dd_cmd = ['/deep-dive', '/deepdive', '/dd']
+    if any(map(message.content.startswith, raw_cmd)):
         info = get_last_deep_dive_info(True)
         await message.channel.send(info)
         return
-    if message.content.startswith('/deep-dive'):
+    if any(map(message.content.startswith, dd_cmd)):
         info = get_last_deep_dive_info()
         if info:
             await message.channel.send(info)
