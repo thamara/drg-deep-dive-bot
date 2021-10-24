@@ -29,6 +29,7 @@ REDDIT_SECRET=<REDDIT SECRET>
 TOKEN=<DISCORD BOT TOKEN>
 ```
 4. Run `python main.py`
+5. You can use the command `/deep-dive-raw` to retrieve the thread without parsing.
 
 # Credits
 
