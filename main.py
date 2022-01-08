@@ -18,8 +18,7 @@ class DeepDive:
         self.stages.append([stage, primary, secondary, anomaly, warning])
     
     def to_beautiful_string(self):
-        out = f"**{self.type}** | {self.name} | {self.biome}\n"
-        out += '```\n'
+        out = f'**{self.type}**\n```\n'
         out += tabulate(self.stages, headers=["Stage", "Primary", "Secondary", "Anomaly", "Warning"], tablefmt="fancy_grid")
         out += '```'
         return out
@@ -33,7 +32,7 @@ def parse_deep_dive_info(text, type):
         if dd and len(sline) >= 6 and sline[0] == '':
             [stage, primary, secondary, anomaly, warning] = sline[1:6]
             # ignore header
-            if stage == 'Stage':
+            if stage == '**Stage**' or stage == ':-':
                 continue
             dd.add_stage(stage, primary, secondary, anomaly, warning)
             if stage == '3':
@@ -71,11 +70,13 @@ def get_last_deep_dive_info(raw=False):
     url = f'**Source**: <{submission.url}>'
     title = f'**{submission.title}**'
 
-    return '\n'.join([title,
+    result = '\n'.join([title,
                       '',
                       dd.to_beautiful_string(),
                       edd.to_beautiful_string(),
                       url])
+    print(f"result len: {len(result)}")
+    return result
 
 client = discord.Client()
 
