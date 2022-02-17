@@ -26,13 +26,14 @@ class DeepDive:
 def parse_deep_dive_info(text, type):
     dd = None
     for line in text.split('\n'):
+        line = line.replace('*', '')
         sline = [x.strip() for x in line.split('|')]
-        if len(sline) > 2 and sline[0] == f'**{type}**':
+        if len(sline) > 2 and sline[0] == type:
             dd = DeepDive(type, sline[1], sline[2])
         if dd and len(sline) >= 6 and sline[0] == '':
             [stage, primary, secondary, anomaly, warning] = sline[1:6]
             # ignore header
-            if stage == '**Stage**' or stage == ':-':
+            if stage == 'Stage' or stage == ':-':
                 continue
             dd.add_stage(stage, primary, secondary, anomaly, warning)
             if stage == '3':
@@ -51,6 +52,7 @@ def get_last_deep_dive_submission():
     for submission in subreddit.hot(limit=5):
         if "Weekly Deep Dives Thread" in submission.title:
             return submission
+    print('No deep dive submission found')
     return None
 
 def get_last_deep_dive_info(raw=False):
@@ -65,6 +67,7 @@ def get_last_deep_dive_info(raw=False):
     edd = parse_deep_dive_info(text, 'Elite Deep Dive')
 
     if not dd or not edd:
+        print('No deep dive (or elite deep dive) info found')
         return None
 
     url = f'**Source**: <{submission.url}>'
@@ -75,7 +78,7 @@ def get_last_deep_dive_info(raw=False):
                       dd.to_beautiful_string(),
                       edd.to_beautiful_string(),
                       url])
-    print(f"result len: {len(result)}")
+    print(f"Result len: {len(result)}")
     return result
 
 client = discord.Client()
@@ -88,7 +91,6 @@ async def on_ready():
 async def on_message(message):
     if message.author == client.user:
         return
-
     raw_cmd = ['/deep-dive-raw']
     dd_cmd = ['/deep-dive', '/deepdive', '/dd']
     if any(map(message.content.startswith, raw_cmd)):
