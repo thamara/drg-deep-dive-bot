@@ -2,6 +2,9 @@ import os
 import discord
 import praw
 from tabulate import tabulate
+from urllib3 import Retry
+
+from random_drg import Build, is_valid_class
 
 # If running locally, support .env file for setting the environment variables
 from dotenv import load_dotenv
@@ -101,6 +104,15 @@ async def on_message(message):
         info = get_last_deep_dive_info()
         if info:
             await message.channel.send(info)
+        return
+    if (message.content.startswith('/rand')):
+        splitted_message = message.content.split(' ')
+        klass = splitted_message[1].lower() if len(splitted_message) > 1 else None
+        if is_valid_class(klass):
+            build = Build(klass)
+            await message.channel.send(str(build))
+        else:
+            await message.channel.send(f'Invalid class {klass}. Valid classes are Engineer, Gunner, Driller or Scout. Leave empty for random.')
         return
     
 client.run(os.environ['TOKEN'])
