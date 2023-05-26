@@ -6,7 +6,7 @@ DRG Deep Dive is a Discord bot that retrieves information from Reddit to show yo
 
 # Usage
 
-[Install](https://discord.com/api/oauth2/authorize?client_id=894339506038247485&permissions=2147502080&scope=bot) bot on server and call it with `/deepdive`.
+[Install](https://discord.com/api/oauth2/authorize?client_id=894339506038247485&permissions=2147485696&scope=bot) bot on server and call it with `/deepdive`.
 
 Alias commands: `/dd`, `/deep-dive`.
 
