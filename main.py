@@ -1,6 +1,8 @@
-import os
 import discord
+import os
 import praw
+import random
+from discord import app_commands
 from tabulate import tabulate
 from urllib3 import Retry
 
@@ -84,35 +86,34 @@ def get_last_deep_dive_info(raw=False):
     print(f"Result len: {len(result)}")
     return result
 
-client = discord.Client()
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
+tree = app_commands.CommandTree(client)
 
 @client.event
 async def on_ready():
+    print('Syncing commands')
+    await tree.sync()
     print('We have logged in as {0.user}'.format(client))
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    raw_cmd = ['/deep-dive-raw']
-    dd_cmd = ['/deep-dive', '/deepdive', '/dd']
-    if any(map(message.content.startswith, raw_cmd)):
-        info = get_last_deep_dive_info(True)
-        await message.channel.send(info)
-        return
-    if any(map(message.content.startswith, dd_cmd)):
-        info = get_last_deep_dive_info()
-        if info:
-            await message.channel.send(info)
-        return
-    if (message.content.startswith('/rand')):
-        splitted_message = message.content.split(' ')
-        klass = splitted_message[1].lower() if len(splitted_message) > 1 else None
-        if is_valid_class(klass):
-            build = Build(klass)
-            await message.channel.send(str(build))
-        else:
-            await message.channel.send(f'Invalid class {klass}. Valid classes are Engineer, Gunner, Driller or Scout. Leave empty for random.')
-        return
+@tree.command(name="deep-dive-info", description = "Get this week DD/EDD information")
+async def deep_dive(interaction : discord.Interaction):
+    info = get_last_deep_dive_info()
+    if info:
+        await interaction.response.send_message(info)
+
+@tree.command(name="drg-rand-build", description = "Get a random build for DRG")
+@app_commands.choices(character=[
+        app_commands.Choice(name="Rand!", value='rand'),
+        app_commands.Choice(name="Driller", value='driller'),
+        app_commands.Choice(name="Scout", value='scout'),
+        app_commands.Choice(name="Engineer", value='engineer'),
+        app_commands.Choice(name="Gunner", value='gunner'),
+        ])
+async def rand_build(interaction : discord.Interaction, character : str):
+    klass = character if character != 'rand' else random.choice(['driller', 'scout', 'engineer', 'gunner'])
+    if is_valid_class(klass):
+        build = Build(klass)
+        await interaction.response.send_message(str(build))
     
 client.run(os.environ['TOKEN'])
